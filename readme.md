@@ -1,38 +1,27 @@
 # VAF-TC Relationship Visualizer 🧬
 
 ## Overview
-The **VAF-TC Relationship Visualizer** is an interactive clinical tool designed to assist in the interpretation of genetic variants by modeling the mathematical relationship between **Pathological Tumor Content (TC)** and **Variant Allele Fraction (VAF)**. 
+[cite_start]The **VAF-TC Relationship Visualizer** is an interactive clinical tool designed to assist in the interpretation of genetic variants by modeling the mathematical relationship between **Pathological Tumor Content (TC)** and **Variant Allele Fraction (VAF)**[cite: 10, 22]. 
 
-This tool helps clinicians and researchers evaluate the likelihood of germline vs. somatic events, providing a theoretical framework based on Knudson's Two-Hit Theory and various copy number alteration models.
+[cite_start]This tool is uniquely effective for interpreting hypermutated cases, including **MMRd** and **POLEm** tumors, providing high clinical novelty in the analysis of TMB-high cases[cite: 4, 6].
 
 ## 🚀 Live Application
 Access the interactive web tool here:
 **[https://vaf-tc-app.streamlit.app/](https://vaf-tc-app.streamlit.app/)**
 
-## 📂 Downloadable Data Resources
-For users who prefer offline analysis, batch processing of multiple variants, or custom editing, the following raw data files are available in this repository:
-- **[VAF_TC_theoretical_model.xlsx](./VAF_TC_theoretical_model.xlsx):** Excel format for easy editing and paper-based use.
-- **[VAF_TC_theoretical_model.csv](./VAF_TC_theoretical_model.csv):** Raw data in CSV format.
-- **[data_dictionary.txt](./data_dictionary.txt):** Detailed descriptions of all data columns.
+## 📂 Data Resources & Offline Analysis
+[cite_start]To support users processing multiple variants in a single case or those preferring offline documentation, the following resources are available in this repository[cite: 1, 8, 9]:
+- [cite_start]**[VAF_TC_theoretical_model.xlsx](./VAF_TC_theoretical_model.xlsx):** Excel format for batch processing and paper-based records[cite: 8].
+- [cite_start]**[VAF_TC_theoretical_model.csv](./VAF_TC_theoretical_model.csv):** Raw data for computational analysis.
+- **[data_dictionary.txt](./data_dictionary.txt):** Descriptions of theoretical models and data columns.
 
 ## Key Features
-* **Automated Interpretation:** Dynamically identifies theoretical models within a **±10% measurement error threshold**.
-* **TMB-high Tumor Application:** Highly effective for interpreting hypermutated cases, including **MMRd** and **POLEm** tumors, as discussed in the associated study.
-* **Convergence Zone (Gray Zone) Alert:** A warning system for samples where germline LOH and somatic LOH curves converge (typically TC 60–75%).
-* **Pathological Integration:** Designed for use with **Pathological TC (%)** to ensure clinical reliability.
+* [cite_start]**Automated Interpretation:** Dynamically identifies theoretical models within a **±10% measurement error threshold**, acknowledging variance common in clinical NGS data[cite: 8, 20].
+* [cite_start]**Convergence Zone Alert:** A warning system for samples where germline LOH and somatic LOH curves converge (typically TC 60–75%)[cite: 11, 16].
+* [cite_start]**Pathological Reliability:** Designed for use with **Pathological TC (%)** to ensure accuracy over NGS-based estimations[cite: 22].
 
 ## Clinical Significance
-Distinguishing between germline and somatic variants is critical in tumor-only sequencing. High-TC samples (TC ≥ 90%) with elevated VAFs are often misidentified as somatic events when they actually represent **Germline LOH**. 
-
-Accurate identification of **Biallelic inactivation (LOH)** is therapeutically significant for identifying HBOC/Lynch Syndrome and determining sensitivity to **PARP inhibitors**, regardless of the variant's origin.
-
-## How to Use
-1. **Online:** Use the [Web App](https://vaf-tc-app.streamlit.app/) for quick, interactive visualization.
-2. **Offline/Batch:** Download the `.xlsx` file to process multiple mutant genes in a single clinical case or for paper-based records.
-
-## Citation
-If you use this tool or data in your research, please cite:
-*Integrated VAF-TC graph: a novel tool for differentiating germline from somatic variants in tumor-only sequencing* (In preparation/submission).
+Accurate identification of **Biallelic inactivation (LOH)** is therapeutically significant. [cite_start]Regardless of whether the initial variant is germline or somatic in origin, LOH is a critical indicator for sensitivity to **PARP inhibitors**[cite: 18, 27]. [cite_start]High-VAF variants in high-TC samples (TC ≥ 90%) are statistically more likely to represent **Germline LOH**[cite: 23, 24].
 
 ---
-© 2024 Clinical-Genetics-Suite
+© 2026 Clinical-Genetics-Suite
