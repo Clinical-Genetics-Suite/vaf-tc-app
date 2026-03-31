@@ -31,19 +31,20 @@ st.subheader("🚨 Real-time Clinical Alerts")
 
 # Point 1: The 50% VAF Trap (TC 60-75%)
 if 60 <= tc_input <= 75:
-    v_loh = models["Somatic LOH (with Del)"]
+    v_loh_trap = models["Somatic LOH (with Del)"]
     st.warning(f"""
     **Alert: The 50% VAF Trap**
-    At TC {tc_input}%, the theoretical VAF for Somatic LOH is {v_loh:.1f}%. Since this crosses the 50% threshold at TC ≈ 66.7%, 
+    At TC {tc_input}%, the theoretical VAF for Somatic LOH is {v_loh_trap:.1f}%. Since this crosses the 50% threshold at TC ≈ 66.7%, 
     somatic drivers can mimic heterozygous germline variants. Use caution before assuming germline status.
     """)
 
-# Point 2: Convergence Alert (TC >= 70%) - Requested by Author
+# Point 2: Convergence Alert (TC >= 70%) - Corrected KeyError (Removed 'Marc')
 if tc_input >= 70 and vaf_input >= models["Somatic LOH (with Del)"]:
+    val_threshold = models["Somatic LOH (with Del)"]
     st.error(f"""
     **⚠️ LOH Convergence Alert (TC ≥ 70%):**
     Potential convergence of Germline LOH and Somatic LOH detected. 
-    When TC is ≥ 70% and the VAF is at or above the theoretical line for Somatic LOH with deletion ({models['Somatic LOH (with Del) Marc']:.1f}%), 
+    When TC is ≥ 70% and the VAF is at or above the theoretical line for Somatic LOH with deletion ({val_threshold:.1f}%), 
     these two biological events become increasingly difficult to distinguish based on VAF alone.
     """)
 
@@ -73,7 +74,7 @@ else:
 with st.expander("📝 Clinical Significance & Therapeutic Implications"):
     st.markdown("""
     ### Hereditary Cancer Inference
-    Syndromes driven by tumor suppressor genes (**HBOC, Lynch Syndrome, FAP**) can be inferred when VAFs align with theoretical "two-hit" lines.
+    Syndromes driven by tumor suppressor genes (**HBOC, Lynch Syndrome, FAP**) can be inferred when VAFs align with theoretical "two-hit" lines based on **Knudson’s two-hit model**.
     
     ### Therapeutic Guidance
     - **BRCA1/2-associated tumors:** May indicate sensitivity to **PARP inhibitors**.
@@ -91,4 +92,14 @@ tr = np.linspace(10, 100, 100)
 fr = tr / 100
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=tr, y=(fr/2)*100, name="Somatic Het", line=dict(color='blue', width=1)))
-fig.add_trace(go.Scatter(x=tr, y=(fr/(2-fr))*100, name="Somatic
+fig.add_trace(go.Scatter(x=tr, y=(fr/(2-fr))*100, name="Somatic LOH (Del)", line=dict(color='blue', dash='dash')))
+fig.add_trace(go.Scatter(x=tr, y=[50]*100, name="Germline Het", line=dict(color='green', width=1)))
+fig.add_trace(go.Scatter(x=tr, y=(1/(2-fr))*100, name="Germline LOH (Del)", line=dict(color='red', width=2)))
+fig.add_trace(go.Scatter(x=[tc_input], y=[vaf_input], mode='markers+text', name="CASE", text=["CASE"], marker=dict(color='black', size=15, symbol='x')))
+
+fig.update_layout(xaxis_title="Pathological Tumor Content (%)", yaxis_title="Theoretical VAF (%)",
+                  legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1))
+st.plotly_chart(fig, use_container_width=True)
+
+st.divider()
+st.caption("Developed by Clinical Genetics Suite (Maintainer: Sawai1960). Version 2.4 (Hotfix: KeyError Resolved).")
