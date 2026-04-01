@@ -65,12 +65,11 @@ with col_alerts:
     # --- Clinical Alerts ---
 
     # Pre-compute key thresholds
-    som_cnloh_vaf = tc * 100                        # Somatic + cnLOH = TC
-    som_del_vaf = tc / (2 - tc) * 100               # Somatic + LOH (Del)
-    germ_del_vaf = 1 / (2 - tc) * 100               # Germline + LOH (Del)
+    som_cnloh_vaf = tc * 100
+    som_del_vaf = tc / (2 - tc) * 100
+    germ_del_vaf = 1 / (2 - tc) * 100
 
-    # Trap 1: Somatic cnLOH Trap (TC 40–60%)
-    #   At TC ≈ 50%, Somatic+cnLOH = TC ≈ 50% = Germline Hetero
+    # Alert 1: Somatic cnLOH Trap (TC 40–60%)
     if 40 <= tc_input <= 60:
         st.warning(
             f"⚠️ **Somatic cnLOH Trap:** At TC {tc_input}%, Somatic cnLOH (UPD) "
@@ -80,8 +79,7 @@ with col_alerts:
             f"Pair-normal testing is essential."
         )
 
-    # Trap 2: Somatic LOH (Del) approaching 50% (TC 61–66%)
-    #   Gray Zone: Somatic+LOH(Del) approaches Germline Hetero from below
+    # Alert 2: Gray Zone (TC 61–66%)
     elif 61 <= tc_input <= 66:
         st.warning(
             f"⚠️ **Gray Zone (Somatic LOH Del):** At TC {tc_input}%, "
@@ -91,8 +89,6 @@ with col_alerts:
         )
 
     # Alert 3: LOH Convergence Zone (TC ≥ 67%)
-    #   At TC = 2/3 ≈ 66.7%, Somatic+LOH(Del) = Germline Hetero = 50%
-    #   Above this TC, the somatic and germline LOH lines converge
     elif tc_input >= 67:
         if vaf_input >= tc / (2 - tc) * 100:
             st.error(
@@ -116,9 +112,21 @@ with col_alerts:
     # Feature: CSV Template Download
     st.subheader("📊 Multi-variant Workflow")
     template_df = pd.DataFrame({"Gene": [gene_name, "TP53"], "TC": [tc_input, tc_input], "VAF": [vaf_input, 0.0]})
-    csv_buffer = io.BytesIO()
-    template_df.to_csv(csv_buffer, index=False)
-    st.download_button("📥 Download CSV Template", csv_buffer.getvalue(), "VAF_TC_Template.csv", "text/csv")
+    csv_string = template_df.to_csv(index=False)
+    st.download_button("📥 Download CSV Template", csv_string.encode("utf-8"), "VAF_TC_Template.csv", "text/csv")
+
+    # Theoretical Model Data Downloads
+    st.subheader("📂 Theoretical Model Data")
+    try:
+        with open("VAF_TC_theoretical_model.csv", "rb") as f:
+            st.download_button("📥 Download Theoretical Model (CSV)", f.read(), "VAF_TC_theoretical_model.csv", "text/csv")
+    except FileNotFoundError:
+        st.caption("VAF_TC_theoretical_model.csv not found.")
+    try:
+        with open("VAF-TC theoretical_model.xlsx", "rb") as f:
+            st.download_button("📥 Download Theoretical Model (Excel)", f.read(), "VAF-TC_theoretical_model.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    except FileNotFoundError:
+        st.caption("VAF-TC theoretical_model.xlsx not found.")
 
     # Clinical Notes
     with st.expander("📝 Clinical Notes", expanded=True):
