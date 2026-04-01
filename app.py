@@ -64,24 +64,39 @@ with col_alerts:
 
     # Mathematical Match Analysis (±10% error margin)
     error_margin = 0.10
-    models_check = {
-        "Germline + cnLOH": (1 + tc) / 2,
-        "Germline + LOH (Del)": 1 / (2 - tc),
-        "Germline (Hetero)": 0.5,
-        "Somatic + cnLOH": tc,
-        "Somatic + LOH (Del)": tc / (2 - tc)
-    }
-    compatible_models = [
-        (name, val) for name, val in models_check.items()
-        if abs(val - vaf) <= error_margin
-    ]
 
-    if compatible_models:
-        st.success(f"**Compatible Models for {gene_name} (±10%):**")
-        for name, val in compatible_models:
-            st.markdown(f"- **{name}** — theoretical VAF {val*100:.1f}%")
+    def get_compatible_models(tc_val, vaf_val):
+        f = tc_val / 100.0
+        v = vaf_val / 100.0
+        checks = {
+            "Germline + cnLOH": (1 + f) / 2,
+            "Germline + LOH (Del)": 1 / (2 - f),
+            "Germline (Hetero)": 0.5,
+            "Somatic + cnLOH": f,
+            "Somatic + LOH (Del)": f / (2 - f)
+        }
+        return [(name, val) for name, val in checks.items() if abs(val - v) <= error_margin]
+
+    if multi_df is not None:
+        # Multi-variant interpretation
+        for _, row in multi_df.iterrows():
+            g, t, v = str(row["Gene"]), float(row["TC"]), float(row["VAF"])
+            compatible = get_compatible_models(t, v)
+            if compatible:
+                st.success(f"**{g}** (TC {t:.0f}%, VAF {v:.0f}%)")
+                for name, val in compatible:
+                    st.markdown(f"- **{name}** — theoretical VAF {val*100:.1f}%")
+            else:
+                st.info(f"**{g}** (TC {t:.0f}%, VAF {v:.0f}%) — No model match within ±10%.")
     else:
-        st.info(f"**Insight:** VAF {vaf_input}% does not align with any standard model at TC {tc_input}% (±10%).")
+        # Single-variant interpretation
+        compatible_models = get_compatible_models(tc_input, vaf_input)
+        if compatible_models:
+            st.success(f"**Compatible Models for {gene_name} (±10%):**")
+            for name, val in compatible_models:
+                st.markdown(f"- **{name}** — theoretical VAF {val*100:.1f}%")
+        else:
+            st.info(f"**Insight:** VAF {vaf_input}% does not align with any standard model at TC {tc_input}% (±10%).")
 
     # --- Clinical Alerts ---
 
