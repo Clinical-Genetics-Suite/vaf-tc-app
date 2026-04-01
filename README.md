@@ -62,8 +62,24 @@ At very high purity, all five theoretical models compress into a narrow VAF rang
 - **Interactive graph** with five theoretical VAF-TC curves (Plotly)
 - **Model matching** with +/-10% error margin and theoretical VAF display
 - **Low Confidence Zone** shading for TC < 30%
+- **Multi-variant CSV upload** to plot multiple variants simultaneously on the graph
 - **CSV template download** for multi-variant workflows
 - **Theoretical model data download** (CSV and Excel) directly from the app
+
+## Multi-variant Upload
+
+Multiple variants from a single patient can be uploaded as a CSV file and plotted simultaneously on the graph. This is particularly useful for cases with high mutational burden (e.g., Lynch syndrome, POLE-mutant tumors).
+
+**CSV format:**
+
+```
+Gene,TC,VAF
+BRCA2,70,57
+TP53,70,35
+MSH2,70,68
+```
+
+Each variant is plotted with a distinct color and gene label. A template CSV can be downloaded from within the app.
 
 ## Getting Started
 
@@ -83,7 +99,7 @@ streamlit run app.py
 
 | File | Description |
 |------|-------------|
-| app.py | Main Streamlit application (ver 3.0) |
+| app.py | Main Streamlit application (ver 3.1) |
 | requirements.txt | Python dependencies |
 | VAF-TC theoretical_model.xlsx | Excel file for generating theoretical VAF-TC curves |
 | VAF_TC_theoretical_model.csv | CSV version of the theoretical model data |
