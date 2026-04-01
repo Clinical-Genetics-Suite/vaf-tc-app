@@ -63,6 +63,7 @@ At very high purity, all five theoretical models compress into a narrow VAF rang
 - **Model matching** with +/-10% error margin and theoretical VAF display
 - **Low Confidence Zone** shading for TC < 30%
 - **CSV template download** for multi-variant workflows
+- **Theoretical model data download** (CSV and Excel) directly from the app
 - **Clinical notes** on PARPi indications and Lynch Syndrome / ICI responsiveness
 
 ## Getting Started
