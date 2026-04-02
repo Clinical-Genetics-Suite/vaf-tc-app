@@ -13,7 +13,49 @@ st.markdown("Interactive visual tool for germline/somatic variant differentiatio
 st.caption("⚠️ This tool is intended as a supportive aid for genetic counseling. It does not replace confirmatory germline testing or established clinical guidelines.")
 st.caption("⚠️ This tool does not incorporate gene-specific prior probabilities. Genes such as TP53, APC, and PTEN have high somatic mutation rates; clinical context and family history are essential for interpretation.")
 
-# 3. Sidebar Input Parameters
+# 3. Gene Reference Data
+GENE_INFO = {
+    # Germline-priority genes
+    "BRCA1":  ("germline", "🟡 BRCA1: Germline variants are clinically significant (HBOC). Confirmatory germline testing is recommended when VAF pattern is consistent with germline."),
+    "BRCA2":  ("germline", "🟡 BRCA2: Germline variants are clinically significant (HBOC). Confirmatory germline testing is recommended when VAF pattern is consistent with germline."),
+    "PALB2":  ("germline", "🟡 PALB2: Germline variants are associated with hereditary breast cancer. Confirmatory germline testing is recommended."),
+    "ATM":    ("germline", "🟡 ATM: Germline variants are associated with hereditary breast cancer and ataxia-telangiectasia. Confirmatory testing is recommended."),
+    "CHEK2":  ("germline", "🟡 CHEK2: Germline variants are associated with hereditary breast and colorectal cancer. Confirmatory testing is recommended."),
+    "MLH1":   ("germline", "🟡 MLH1: Germline variants are associated with Lynch syndrome. Confirmatory germline testing is strongly recommended."),
+    "MSH2":   ("germline", "🟡 MSH2: Germline variants are associated with Lynch syndrome. Confirmatory germline testing is strongly recommended."),
+    "MSH6":   ("germline", "🟡 MSH6: Germline variants are associated with Lynch syndrome. Confirmatory germline testing is strongly recommended."),
+    "PMS2":   ("germline", "🟡 PMS2: Germline variants are associated with Lynch syndrome. Confirmatory germline testing is strongly recommended."),
+    "RAD51C": ("germline", "🟡 RAD51C: Germline variants are associated with hereditary ovarian cancer. Confirmatory testing is recommended."),
+    "RAD51D": ("germline", "🟡 RAD51D: Germline variants are associated with hereditary ovarian cancer. Confirmatory testing is recommended."),
+    "CDH1":   ("germline", "🟡 CDH1: Germline variants are associated with hereditary diffuse gastric cancer. Confirmatory testing is recommended."),
+    "VHL":    ("germline", "🟡 VHL: Germline variants are associated with von Hippel-Lindau disease. Confirmatory testing is recommended."),
+    "RB1":    ("germline", "🟡 RB1: Germline variants are associated with hereditary retinoblastoma. Confirmatory testing is recommended."),
+    "NF1":    ("germline", "🟡 NF1: Germline variants are associated with neurofibromatosis type 1. Confirmatory testing is recommended."),
+    "STK11":  ("germline", "🟡 STK11: Germline variants are associated with Peutz-Jeghers syndrome. Confirmatory testing is recommended."),
+    # Dual-importance genes
+    "TP53":   ("dual", "🟠 TP53: **Both germline and somatic variants are clinically important.** Somatic TP53 mutations are the most common in cancer. However, germline TP53 (Li-Fraumeni syndrome) should be considered in young-onset cancer, multiple primary cancers, or strong family history."),
+    "APC":    ("dual", "🟠 APC: **Both germline and somatic variants are clinically important.** Somatic APC mutations are frequent in colorectal cancer. Germline APC (familial adenomatous polyposis, FAP) should be considered when polyposis or strong family history is present."),
+    "PTEN":   ("dual", "🟠 PTEN: **Both germline and somatic variants are clinically important.** Somatic PTEN loss is common in many cancers. Germline PTEN (Cowden syndrome) should be considered when multiple hamartomas or relevant family history is present."),
+    "CDKN2A": ("dual", "🟠 CDKN2A: **Both germline and somatic variants are clinically important.** Somatic alterations are common. Germline CDKN2A is associated with hereditary melanoma and pancreatic cancer."),
+    # Somatic-priority genes
+    "KRAS":   ("somatic", "🔵 KRAS: Germline KRAS variants causing cancer are extremely rare. This variant is most likely somatic in origin."),
+    "PIK3CA": ("somatic", "🔵 PIK3CA: Germline variants are extremely rare in cancer. This variant is most likely somatic in origin."),
+    "BRAF":   ("somatic", "🔵 BRAF: Germline variants are extremely rare in cancer. This variant is most likely somatic in origin."),
+    "EGFR":   ("somatic", "🔵 EGFR: Germline variants are extremely rare in cancer. This variant is most likely somatic in origin."),
+    "NRAS":   ("somatic", "🔵 NRAS: Germline variants are extremely rare in cancer. This variant is most likely somatic in origin."),
+    "IDH1":   ("somatic", "🔵 IDH1: Germline variants are extremely rare. This variant is most likely somatic in origin."),
+    "IDH2":   ("somatic", "🔵 IDH2: Germline variants are extremely rare. This variant is most likely somatic in origin."),
+    "MET":    ("somatic", "🔵 MET: Somatic mutations are common. Germline MET is rarely associated with hereditary papillary renal cell carcinoma."),
+    "CDK4":   ("somatic", "🔵 CDK4: Germline variants are extremely rare in cancer. This variant is most likely somatic in origin."),
+}
+
+def get_gene_message(gene):
+    key = gene.upper().strip()
+    if key in GENE_INFO:
+        return GENE_INFO[key]
+    return ("unknown", f"⬜ {gene}: Not in reference list. Consult established clinical guidelines and family history for interpretation.")
+
+# 4. Sidebar Input Parameters
 st.sidebar.header("📋 Patient Data Input")
 st.sidebar.markdown("👉 **Please enter Gene Name, TC, and VAF.**")
 
@@ -46,10 +88,20 @@ if uploaded_file is not None:
 st.sidebar.markdown("---")
 st.sidebar.info(f"💡 **Analysis Mode:** {gene_name}")
 
+# Gene Reference Table in Sidebar
+with st.sidebar.expander("📖 Gene Reference"):
+    st.markdown("**🟡 Germline-priority genes:**")
+    st.caption("BRCA1, BRCA2, PALB2, ATM, CHEK2, MLH1, MSH2, MSH6, PMS2, RAD51C, RAD51D, CDH1, VHL, RB1, NF1, STK11")
+    st.markdown("**🟠 Both germline & somatic important:**")
+    st.caption("TP53 (Li-Fraumeni), APC (FAP), PTEN (Cowden), CDKN2A (hereditary melanoma)")
+    st.markdown("**🔵 Somatic-priority genes:**")
+    st.caption("KRAS, PIK3CA, BRAF, EGFR, NRAS, IDH1, IDH2, MET, CDK4")
+    st.caption("⬜ Genes not listed: consult clinical guidelines and family history.")
+
 tc = tc_input / 100.0
 vaf = vaf_input / 100.0
 
-# 4. Mathematical Foundation (diploid model)
+# 5. Mathematical Foundation (diploid model)
 x_range = np.linspace(0.01, 1.0, 100)
 y_germ_cnloh = (1 + x_range) / 2
 y_germ_del = 1 / (2 - x_range)
@@ -57,14 +109,13 @@ y_germ_hetero = np.full_like(x_range, 0.5)
 y_som_cnloh = x_range
 y_som_del = x_range / (2 - x_range)
 
-# 5. Main Layout (Left 1 : Right 2)
+# 6. Main Layout (Left 1 : Right 2)
 col_alerts, col_graph = st.columns([1, 2])
 
 # --- LEFT COLUMN: Clinical Interpretation & Alerts ---
 with col_alerts:
     st.subheader("📋 Interpretation & Alerts")
 
-    # Mathematical Match Analysis (±10% error margin)
     error_margin = 0.10
 
     def get_compatible_models(tc_val, vaf_val):
@@ -83,11 +134,11 @@ with col_alerts:
         names = [name for name, _ in compatible]
         if not names:
             return "warning", "VAF does not align with any standard model. Consider clonal heterogeneity, aneuploidy, or complex copy number changes."
-        germ_hetero  = "Germline (Hetero)"   in names
-        germ_cnloh   = "Germline + cnLOH"    in names
-        germ_del     = "Germline + LOH (Del)" in names
-        som_cnloh    = "Somatic + cnLOH"      in names
-        som_del      = "Somatic + LOH (Del)"  in names
+        germ_hetero = "Germline (Hetero)"    in names
+        germ_cnloh  = "Germline + cnLOH"     in names
+        germ_del    = "Germline + LOH (Del)"  in names
+        som_cnloh   = "Somatic + cnLOH"       in names
+        som_del     = "Somatic + LOH (Del)"   in names
 
         if germ_hetero and som_cnloh and not germ_del and not som_del:
             return "error", "VAF alone **cannot distinguish** Germline (Hetero) from Somatic + cnLOH (UPD). These two models produce identical VAF at this TC. **Pair-normal germline testing is essential.**"
@@ -106,36 +157,13 @@ with col_alerts:
         else:
             return "info", "Multiple models are compatible. Clinical correlation and pair-normal testing are recommended."
 
-    if multi_df is not None:
-        # Multi-variant interpretation
-        for _, row in multi_df.iterrows():
-            g, t, v = str(row["Gene"]), float(row["TC"]), float(row["VAF"])
-            compatible = get_compatible_models(t, v)
-            st.markdown(f"**{g}** (TC {t:.0f}%, VAF {v:.0f}%)")
-            if compatible:
-                for name, val in compatible:
-                    st.markdown(f"- **{name}** — theoretical VAF {val*100:.1f}%")
-            level, msg = get_interpretation(compatible)
-            if level == "success":
-                st.success(f"➡️ {msg}")
-            elif level == "error":
-                st.error(f"➡️ {msg}")
-            elif level == "warning":
-                st.warning(f"➡️ {msg}")
-            else:
-                st.info(f"➡️ {msg}")
-            st.caption("💡 Note: This interpretation is based solely on VAF–TC mathematical models and does not reflect gene-specific germline likelihood.")
-            st.divider()
-    else:
-        # Single-variant interpretation
-        compatible_models = get_compatible_models(tc_input, vaf_input)
-        if compatible_models:
-            st.success(f"**Compatible Models for {gene_name} (±10%):**")
-            for name, val in compatible_models:
+    def show_variant_interpretation(g, t, v):
+        compatible = get_compatible_models(t, v)
+        st.markdown(f"**{g}** (TC {t:.0f}%, VAF {v:.0f}%)")
+        if compatible:
+            for name, val in compatible:
                 st.markdown(f"- **{name}** — theoretical VAF {val*100:.1f}%")
-        else:
-            st.info(f"**Insight:** VAF {vaf_input}% does not align with any standard model at TC {tc_input}% (±10%).")
-        level, msg = get_interpretation(compatible_models)
+        level, msg = get_interpretation(compatible)
         if level == "success":
             st.success(f"➡️ {msg}")
         elif level == "error":
@@ -144,16 +172,23 @@ with col_alerts:
             st.warning(f"➡️ {msg}")
         else:
             st.info(f"➡️ {msg}")
-        st.caption("💡 Note: This interpretation is based solely on VAF–TC mathematical models and does not reflect gene-specific germline likelihood.")
+        # Gene-specific message
+        _, gene_msg = get_gene_message(g)
+        st.info(gene_msg)
+        st.caption("💡 Note: VAF–TC interpretation is based on mathematical models only and does not reflect gene-specific germline likelihood.")
+
+    if multi_df is not None:
+        for _, row in multi_df.iterrows():
+            show_variant_interpretation(str(row["Gene"]), float(row["TC"]), float(row["VAF"]))
+            st.divider()
+    else:
+        show_variant_interpretation(gene_name, tc_input, vaf_input)
 
     # --- Clinical Alerts ---
-
-    # Pre-compute key thresholds
     som_cnloh_vaf = tc * 100
     som_del_vaf = tc / (2 - tc) * 100
     germ_del_vaf = 1 / (2 - tc) * 100
 
-    # Alert 1: Somatic cnLOH Trap (TC 40–60%)
     if 40 <= tc_input <= 60:
         st.warning(
             f"⚠️ **Somatic cnLOH Trap:** At TC {tc_input}%, Somatic cnLOH (UPD) "
@@ -162,8 +197,6 @@ with col_alerts:
             f"masquerade as a germline heterozygous variant. "
             f"Pair-normal testing is essential."
         )
-
-    # Alert 2: Gray Zone (TC 61–66%)
     elif 61 <= tc_input <= 66:
         st.warning(
             f"⚠️ **Gray Zone (Somatic LOH Del):** At TC {tc_input}%, "
@@ -171,8 +204,6 @@ with col_alerts:
             f"approaching Germline Heterozygous (50%). "
             f"Confirmation testing is recommended."
         )
-
-    # Alert 3: LOH Convergence Zone (TC ≥ 67%)
     elif tc_input >= 67:
         if vaf_input >= tc / (2 - tc) * 100:
             st.error(
@@ -197,8 +228,7 @@ with col_alerts:
     if multi_df is not None:
         st.subheader("📋 Uploaded Variants")
         st.dataframe(multi_df, use_container_width=True)
-
-    st.divider()
+        st.divider()
 
     # CSV Template Download
     st.subheader("📊 Multi-variant Workflow")
@@ -230,14 +260,12 @@ with col_graph:
     st.subheader("📈 VAF-TC Projection")
     fig = go.Figure()
 
-    # Theoretical lines
     fig.add_trace(go.Scatter(x=x_range*100, y=y_germ_cnloh*100, name="Germline + cnLOH", line=dict(color='#d4af37', width=2)))
     fig.add_trace(go.Scatter(x=x_range*100, y=y_germ_del*100, name="Germline + LOH (Del)", line=dict(color='#e41a1c', width=2)))
     fig.add_trace(go.Scatter(x=x_range*100, y=y_germ_hetero*100, name="Germline (Hetero)", line=dict(color='#a65628', width=2)))
     fig.add_trace(go.Scatter(x=x_range*100, y=y_som_cnloh*100, name="Somatic + cnLOH", line=dict(color='#4daf4a', dash='dash')))
     fig.add_trace(go.Scatter(x=x_range*100, y=y_som_del*100, name="Somatic + LOH (Del)", line=dict(color='#377eb8', dash='dot')))
 
-    # Multi-variant plot (CSV upload)
     if multi_df is not None:
         colors = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00',
                   '#a65628','#f781bf','#999999','#66c2a5','#fc8d62']
@@ -252,7 +280,6 @@ with col_graph:
                 showlegend=True
             ))
     else:
-        # Single-variant plot
         fig.add_trace(go.Scatter(
             x=[tc_input], y=[vaf_input],
             mode='markers+text',
@@ -262,7 +289,6 @@ with col_graph:
             marker=dict(color='black', size=14, symbol='circle')
         ))
 
-    # Low Confidence Zone (TC < 30%)
     fig.add_vrect(x0=0, x1=30, fillcolor="gray", opacity=0.1, layer="below", line_width=0,
                   annotation_text="Low Confidence Zone", annotation_position="top left")
 
@@ -274,6 +300,6 @@ with col_graph:
     )
     st.plotly_chart(fig, use_container_width=True)
 
-# 6. Footer
+# 7. Footer
 st.divider()
-st.caption("VAF-TC Precision Analyzer | Clinical Genetics Suite | ver 3.1 ✅")
+st.caption("VAF-TC Precision Analyzer | Clinical Genetics Suite | ver 3.2 ✅")
