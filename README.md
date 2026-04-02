@@ -7,6 +7,7 @@
 An interactive visual tool for differentiating germline and somatic variants in **tumor-only sequencing**, based on the mathematical relationship between pathological **Tumor Content (TC)** and **Variant Allele Fraction (VAF)**.
 
 > **Disclaimer:** This tool is intended as a supportive aid for genetic counseling. It does not replace confirmatory germline testing or established clinical guidelines (ACMG, AMED Kosugi group). Further prospective validation is required.
+> This tool does not incorporate gene-specific prior probabilities. Clinical context and family history are essential for interpretation.
 
 ## Live Application
 
@@ -34,7 +35,7 @@ A **+/-10% error margin** is applied for model matching to account for variabili
 
 ## Clinical Alert System
 
-The app generates four context-dependent alerts based on TC and VAF:
+The app generates six context-dependent alerts based on TC and VAF:
 
 ### Alert 1 - Somatic cnLOH Trap (TC 40-60%)
 
@@ -57,10 +58,32 @@ Both conditions must be met. The alert displays the actual theoretical values fo
 
 At very high purity, all five theoretical models compress into a narrow VAF range. Variants may still be of somatic origin even at high VAF. This alert fires regardless of VAF, as germline testing becomes essential in all cases.
 
+### Alert 5 - Low VAF (VAF <= 20%)
+
+The reliability of the theoretical line is reduced at low VAF. Low VAF may reflect subclonal variants, admixture with normal tissue, or technical noise.
+
+### Alert 6 - High VAF (VAF >= 60%)
+
+High VAF does not exclude a somatic origin. Somatic LOH or copy number changes can elevate VAF into this range.
+
+## Gene Reference System
+
+The app provides gene-specific contextual messages in three categories:
+
+| Category | Genes | Message |
+|---|---|---|
+| 🟡 Germline-priority | BRCA1, BRCA2, PALB2, ATM, CHEK2, MLH1, MSH2, MSH6, PMS2, RAD51C, RAD51D, CDH1, VHL, RB1, NF1, STK11 | Germline variants are clinically significant. Confirmatory testing is recommended. |
+| 🟠 Both important | TP53, APC, PTEN, CDKN2A | Both germline and somatic variants are clinically important. Clinical context is essential. |
+| 🔵 Somatic-priority | KRAS, PIK3CA, BRAF, EGFR, NRAS, IDH1, IDH2, MET, CDK4 | Germline variants are extremely rare. Most likely somatic in origin. |
+| ⬜ Not listed | All other genes | Consult established clinical guidelines and family history. |
+
 ## Features
 
 - **Interactive graph** with five theoretical VAF-TC curves (Plotly)
 - **Model matching** with +/-10% error margin and theoretical VAF display
+- **Automated interpretation** based on compatible model combinations
+- **Gene-specific messages** for 25 clinically relevant genes
+- **Six clinical alerts** based on TC and VAF values
 - **Low Confidence Zone** shading for TC < 30%
 - **Multi-variant CSV upload** to plot multiple variants simultaneously on the graph
 - **CSV template download** for multi-variant workflows
@@ -79,7 +102,7 @@ TP53,70,35
 MSH2,70,68
 ```
 
-Each variant is plotted with a distinct color and gene label. A template CSV can be downloaded from within the app.
+Each variant is plotted with a distinct color and gene label. Interpretation and gene-specific messages are shown for each variant. A template CSV can be downloaded from within the app.
 
 ## Getting Started
 
@@ -99,7 +122,7 @@ streamlit run app.py
 
 | File | Description |
 |------|-------------|
-| app.py | Main Streamlit application (ver 3.1) |
+| app.py | Main Streamlit application (ver 3.2) |
 | requirements.txt | Python dependencies |
 | VAF-TC theoretical_model.xlsx | Excel file for generating theoretical VAF-TC curves |
 | VAF_TC_theoretical_model.csv | CSV version of the theoretical model data |
