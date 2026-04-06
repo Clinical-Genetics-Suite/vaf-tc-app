@@ -134,9 +134,11 @@ streamlit run app.py
 
 ## Changelog (ver 3.4)
 
-- **Moved** Multi-variant Workflow download and Theoretical Model Data download to sidebar (vertically aligned with upload)
+- **Redesigned** sidebar: unified Multi-variant Workflow section (Download template → Upload CSV → warning note) for intuitive user flow
+- **Moved** Theoretical Model Data download to sidebar
 - **Moved** Gene Reference from sidebar to right column below graph (wider display, no longer collapsible)
 - **Moved** Analysis Mode indicator from sidebar to top of left column (prominent banner)
+- **Moved** Important Note from page top (collapsible expander) to bottom of left column (always visible, no longer blocks graph)
 
 ## Changelog (ver 3.3)
 
