@@ -80,10 +80,21 @@ tc_input = st.sidebar.slider("病理学的腫瘍含有率(TC %)", 0, 100, 50)
 vaf_input = st.sidebar.slider("変異アレル頻度(VAF %)", 0, 100, 50)
 
 st.sidebar.markdown("---")
-st.sidebar.caption("⚠️ 下記でCSVをアップロードすると、上記の入力(遺伝子名・TC・VAF)は無効になります。")
 
-# 複数変異CSVアップロード
-st.sidebar.subheader("📂 複数変異アップロード")
+# 複数変異ワークフロー(統合セクション)
+st.sidebar.subheader("📊 複数変異ワークフロー")
+st.sidebar.caption("💡 テンプレートをダウンロードし、サンプル遺伝子を自分のデータに書き換えてから、アップロードしてください。")
+
+# Step 1: CSVテンプレートダウンロード
+template_df = pd.DataFrame({
+    "Gene": [gene_name, "TP53", "MSH2"],
+    "TC":   [tc_input,  tc_input, tc_input],
+    "VAF":  [vaf_input, 0.0,      0.0]
+})
+csv_string = template_df.to_csv(index=False)
+st.sidebar.download_button("📥 CSVテンプレートをダウンロード", csv_string.encode("utf-8"), "VAF_TC_Template.csv", "text/csv")
+
+# Step 2: CSVアップロード
 st.sidebar.caption("CSV形式：Gene, TC, VAF")
 uploaded_file = st.sidebar.file_uploader("CSVをアップロード", type=["csv"])
 
@@ -101,17 +112,9 @@ if uploaded_file is not None:
         st.sidebar.error(f"CSV読み込みエラー：{e}")
         multi_df = None
 
+st.sidebar.caption("⚠️ CSVをアップロードすると、上記の入力(遺伝子名・TC・VAF)は無効になります。")
+
 st.sidebar.markdown("---")
-# CSVテンプレートダウンロード(サイドバー)
-st.sidebar.subheader("📊 複数変異ワークフロー")
-st.sidebar.caption("💡 下記のテンプレートをダウンロードし、サンプル遺伝子を自分のデータに書き換えてから、上の「複数変異アップロード」でアップロードしてください。")
-template_df = pd.DataFrame({
-    "Gene": [gene_name, "TP53", "MSH2"],
-    "TC":   [tc_input,  tc_input, tc_input],
-    "VAF":  [vaf_input, 0.0,      0.0]
-})
-csv_string = template_df.to_csv(index=False)
-st.sidebar.download_button("📥 CSVテンプレートをダウンロード", csv_string.encode("utf-8"), "VAF_TC_Template.csv", "text/csv")
 
 # 理論モデルデータダウンロード(サイドバー)
 st.sidebar.subheader("📂 理論モデルデータ")

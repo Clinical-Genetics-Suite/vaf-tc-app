@@ -80,10 +80,21 @@ tc_input = st.sidebar.slider("Pathological Tumor Content (TC %)", 0, 100, 50)
 vaf_input = st.sidebar.slider("Variant Allele Fraction (VAF %)", 0, 100, 50)
 
 st.sidebar.markdown("---")
-st.sidebar.caption("⚠️ When a CSV is uploaded below, the inputs above (Gene Name, TC, VAF) are disabled.")
 
-# Multi-variant CSV Upload
-st.sidebar.subheader("📂 Multi-variant Upload")
+# Multi-variant Workflow (unified section)
+st.sidebar.subheader("📊 Multi-variant Workflow")
+st.sidebar.caption("💡 Download the template, replace the sample genes with your own data, then upload.")
+
+# Step 1: Download CSV Template
+template_df = pd.DataFrame({
+    "Gene": [gene_name, "TP53", "MSH2"],
+    "TC":   [tc_input,  tc_input, tc_input],
+    "VAF":  [vaf_input, 0.0,      0.0]
+})
+csv_string = template_df.to_csv(index=False)
+st.sidebar.download_button("📥 Download CSV Template", csv_string.encode("utf-8"), "VAF_TC_Template.csv", "text/csv")
+
+# Step 2: Upload CSV
 st.sidebar.caption("CSV format: Gene, TC, VAF")
 uploaded_file = st.sidebar.file_uploader("Upload CSV", type=["csv"])
 
@@ -101,17 +112,9 @@ if uploaded_file is not None:
         st.sidebar.error(f"Error reading CSV: {e}")
         multi_df = None
 
+st.sidebar.caption("⚠️ When a CSV is uploaded, the inputs above (Gene Name, TC, VAF) are disabled.")
+
 st.sidebar.markdown("---")
-# CSV Template Download (sidebar)
-st.sidebar.subheader("📊 Multi-variant Workflow")
-st.sidebar.caption("💡 Download the template below, replace the sample genes with your own data, then upload using **Multi-variant Upload** above.")
-template_df = pd.DataFrame({
-    "Gene": [gene_name, "TP53", "MSH2"],
-    "TC":   [tc_input,  tc_input, tc_input],
-    "VAF":  [vaf_input, 0.0,      0.0]
-})
-csv_string = template_df.to_csv(index=False)
-st.sidebar.download_button("📥 Download CSV Template", csv_string.encode("utf-8"), "VAF_TC_Template.csv", "text/csv")
 
 # Theoretical Model Data Downloads (sidebar)
 st.sidebar.subheader("📂 Theoretical Model Data")
