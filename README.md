@@ -6,8 +6,8 @@
 
 An interactive visual tool for differentiating germline and somatic variants in **tumor-only sequencing**, based on the mathematical relationship between pathological **Tumor Content (TC)** and **Variant Allele Fraction (VAF)**.
 
-> **Disclaimer:** This tool is intended as a supportive aid for genetic counseling. It does not replace confirmatory germline testing or established clinical guidelines (ACMG, AMED Kosugi group). Further prospective validation is required.
-> This tool does not incorporate gene-specific prior probabilities. Clinical context and family history are essential for interpretation.
+> **Disclaimer:** This tool is intended as a supportive aid for genetic counseling. It does not replace confirmatory germline testing or established clinical guidelines. Further prospective validation is required.
+> Gene Reference System is based on the **2025 Kosugi group guidelines** (がん遺伝子パネル検査におけるGPV/PGPV対応手順に関する指針 2025版) — T-only PGPV disclosure recommended gene list.
 
 ## Live Application
 
@@ -19,72 +19,76 @@ In tumor-only comprehensive genomic profiling (CGP), distinguishing germline fro
 
 This tool visualizes five theoretical VAF-TC models derived from **Knudson's two-hit hypothesis** (diploid model) and provides automated clinical alerts for known ambiguity zones.
 
+## Important Note — Mathematical Model Assumptions
+
+1. **Diploid assumption (Knudson's two-hit model):** Each theoretical line represents a specific biallelic inactivation scenario assuming a diploid (2-copy) baseline. The five models are idealized mathematical references, not an exhaustive catalog of all possible mechanisms.
+2. **Aneuploidy is not accounted for:** Real tumors frequently exhibit aneuploidy, whole-chromosome gains/losses, and subclonal heterogeneity. Observed VAF may deviate substantially from the theoretical lines.
+3. **TC estimation carries +/-10-20% error:** Pathological TC estimation is subject to +/-10-20% variability due to histological heterogeneity, sampling region, and inter-observer agreement. A +/-10% matching margin is applied, but clinical interpretation should consider the full uncertainty range.
+4. **Not a diagnostic tool:** This is a visual aid for genetic counseling. Confirmatory germline testing remains the standard for any clinical decision.
+
 ## Mathematical Models
 
 Given tumor content *f* (0-1):
 
 | Model | Formula | Description |
 |-------|---------|-------------|
-| Germline + cnLOH | VAF = (1 + f) / 2 | Germline variant with copy-neutral LOH (UPD) |
-| Germline + LOH (Del) | VAF = 1 / (2 - f) | Germline variant with LOH by deletion |
-| Germline Heterozygous | VAF = 0.5 | Germline variant without LOH |
-| Somatic + cnLOH | VAF = f | Somatic variant with copy-neutral LOH (UPD) |
-| Somatic + LOH (Del) | VAF = f / (2 - f) | Somatic variant with LOH by deletion |
+| germline (cnLOH) | VAF = (1 + f) / 2 | Germline variant with copy-neutral LOH (UPD) |
+| germline (LOH with Del) | VAF = 1 / (2 - f) | Germline variant with LOH by deletion |
+| germline (Hetero) | VAF = 0.5 | Germline heterozygous variant without LOH |
+| somatic (LOH with Del) | VAF = f / (2 - f) | Somatic variant with LOH by deletion |
+| somatic (Hetero) | VAF = f / 2 | Somatic heterozygous variant without LOH |
 
 A **+/-10% error margin** is applied for model matching to account for variability in pathological TC estimation.
 
 ## Clinical Alert System
 
-The app generates six context-dependent alerts based on TC and VAF:
+The app generates five context-dependent alerts based on TC and VAF:
 
-### Alert 1 - Somatic cnLOH Trap (TC 40-60%)
+### Alert 1 — Gray Zone (TC 61-66%)
 
-At TC near 50%, Somatic + cnLOH produces VAF = TC, which falls within +/-10% of Germline Heterozygous (50%). A somatic variant with acquired uniparental disomy (UPD) can masquerade as a germline finding. Pair-normal testing is essential.
+As TC increases toward 66.7%, somatic (LOH with Del) = f/(2-f) approaches 50% from below. In this range, the somatic LOH deletion line is close enough to 50% to create ambiguity with germline (Hetero).
 
-### Alert 2 - Gray Zone (TC 61-66%)
+### Alert 2 — LOH Convergence Zone (TC >= 67%)
 
-As TC increases toward 66.7%, Somatic + LOH (Del) = f/(2-f) approaches 50% from below. In this range, the somatic LOH deletion line is close enough to 50% to create ambiguity with Germline Heterozygous variants.
-
-### Alert 3 - LOH Convergence Zone (TC >= 67%)
-
-At TC = 2/3 (approximately 66.7%), Somatic + LOH (Del) **exactly equals** Germline Heterozygous at 50%. Above this TC, the somatic and germline LOH lines converge. This alert fires when:
+At TC = 2/3 (approximately 66.7%), somatic (LOH with Del) **exactly equals** germline (Hetero) at 50%. Above this TC, the somatic and germline LOH lines converge. This alert fires when:
 
 - **TC >= 67%**, AND
-- **VAF >= Somatic LOH (Del) line** at current TC
+- **VAF >= somatic (LOH with Del) line** at current TC
 
 Both conditions must be met. The alert displays the actual theoretical values for clinical reference.
 
-### Alert 4 - Extreme Tumor Purity (TC >= 90%)
+### Alert 3 — Extreme Tumor Purity (TC >= 90%)
 
 At very high purity, all five theoretical models compress into a narrow VAF range. Variants may still be of somatic origin even at high VAF. This alert fires regardless of VAF, as germline testing becomes essential in all cases.
 
-### Alert 5 - Low VAF (VAF <= 20%)
+### Alert 4 — Low TC (TC <= 20%)
 
-The reliability of the theoretical line is reduced at low VAF. Low VAF may reflect subclonal variants, admixture with normal tissue, or technical noise.
+At low tumor content, theoretical lines are compressed into a narrow VAF range and model matching is less reliable. Subclonal variants, admixture with normal tissue, or technical noise may dominate.
 
-### Alert 6 - High VAF (VAF >= 60%)
+### Alert 5 — High TC (TC >= 60%)
 
-High VAF does not exclude a somatic origin. Somatic LOH or copy number changes can elevate VAF into this range.
+At high tumor content, germline and somatic LOH lines begin to converge. Origin determination by VAF alone becomes increasingly difficult.
 
-## Gene Reference System
+## Gene Reference System (2025 Kosugi Group Guidelines)
 
-The app provides gene-specific contextual messages in three categories:
+The app provides gene-specific contextual messages based on the **2025 Kosugi group guidelines** (がん遺伝子パネル検査におけるGPV/PGPV対応手順に関する指針 2025版), T-only PGPV disclosure recommended gene list (31 genes).
 
-| Category | Genes | Message |
-|---|---|---|
-| 🟡 Germline-priority | BRCA1, BRCA2, PALB2, ATM, CHEK2, MLH1, MSH2, MSH6, PMS2, RAD51C, RAD51D, CDH1, VHL, RB1, NF1, STK11 | Germline variants are clinically significant. Confirmatory testing is recommended. |
-| 🟠 Both important | TP53, APC, PTEN, CDKN2A | Both germline and somatic variants are clinically important. Clinical context is essential. |
-| 🔵 Somatic-priority | KRAS, PIK3CA, BRAF, EGFR, NRAS, IDH1, IDH2, MET, CDK4 | Germline variants are extremely rare. Most likely somatic in origin. |
-| ⬜ Not listed | All other genes | Consult established clinical guidelines and family history. |
+| Category | VAF Threshold | Genes | Notes |
+|---|---|---|---|
+| 🔴 Low threshold | VAF >= 10% | BRCA1, BRCA2 | Even low-VAF variants may be GPV. Expert panel review recommended. |
+| 🟠 Age-conditional | SNV >= 30%, indel >= 20% AND onset < 30 y | APC, CDKN2A, PTEN, RB1, TP53 | Box_E: phenotype evaluation required for APC, PTEN, RB1, TP53 |
+| 🟡 Standard | SNV >= 30%, indel >= 20% | ATM, BAP1, BARD1, BRIP1, CHEK2, DICER1, FH, FLCN, MLH1, MSH2, MSH6, MUTYH(bi), NF1, PALB2, PMS2, POLD1, POLE, RAD51C, RAD51D, RET, SDHA, SDHB, TSC2, VHL | MUTYH: bi-allelic only. NF1: Box_E phenotype evaluation. |
+| ⬜ Not listed | — | All other genes | Not on 2025 T-only PGPV list. Consult clinical guidelines and family history. |
 
 ## Features
 
 - **Interactive graph** with five theoretical VAF-TC curves (Plotly)
 - **Model matching** with +/-10% error margin and theoretical VAF display
 - **Automated interpretation** based on compatible model combinations
-- **Gene-specific messages** for 25 clinically relevant genes
-- **Six clinical alerts** based on TC and VAF values
-- **Low Confidence Zone** shading for TC < 30%
+- **Gene-specific messages** for 31 genes per 2025 Kosugi guidelines
+- **Five clinical alerts** based on TC values
+- **Low Confidence Zone** shading for TC < 20%
+- **Important Note** on startup with model assumptions and limitations
 - **Multi-variant CSV upload** to plot multiple variants simultaneously on the graph
 - **CSV template download** for multi-variant workflows
 - **Theoretical model data download** (CSV and Excel) directly from the app
@@ -122,11 +126,21 @@ streamlit run app.py
 
 | File | Description |
 |------|-------------|
-| app.py | Main Streamlit application (ver 3.2) |
+| app.py | Main Streamlit application (ver 3.3) |
 | requirements.txt | Python dependencies |
 | VAF-TC theoretical_model.xlsx | Excel file for generating theoretical VAF-TC curves |
 | VAF_TC_theoretical_model.csv | CSV version of the theoretical model data |
 | data_dictionary.txt | Variable definitions for the theoretical model |
+
+## Changelog (ver 3.3)
+
+- **Removed** Somatic + cnLOH model; **added** somatic (Hetero) = f/2
+- **Renamed** all model labels to lowercase format: germline (cnLOH), germline (LOH with Del), germline (Hetero), somatic (LOH with Del), somatic (Hetero)
+- **Deleted** Alert 1 (Somatic cnLOH Trap); alerts renumbered (5 total)
+- **Changed** Low VAF / High VAF alerts to **Low TC / High TC** alerts
+- **Changed** Low Confidence Zone from TC < 30% to **TC < 20%**
+- **Added** Important Note on startup (Knudson assumptions, aneuploidy, TC estimation error)
+- **Rebuilt** Gene Reference System per **2025 Kosugi group guidelines** (31 genes, 3 tiers)
 
 ## Citation
 
