@@ -7,7 +7,7 @@
 An interactive visual tool for differentiating germline and somatic variants in **tumor-only sequencing**, based on the mathematical relationship between pathological **Tumor Content (TC)** and **Variant Allele Fraction (VAF)**.
 
 > **Disclaimer:** This tool is intended as a supportive aid for genetic counseling. It does not replace confirmatory germline testing or established clinical guidelines. Further prospective validation is required.
-> Gene Reference System is based on the **2025 Kosugi group guidelines** (がん遺伝子パネル検査におけるGPV/PGPV対応手順に関する指針 2025版) — T-only PGPV disclosure recommended gene list.
+> Gene Reference System is based on the **Guidelines for GPV/PGPV Handling Procedures in Cancer Gene Panel Testing (2025 Edition)** (MHLW Research Grant) — T-only PGPV disclosure recommended gene list.
 
 ## Live Application
 
@@ -69,9 +69,9 @@ At low tumor content, theoretical lines are compressed into a narrow VAF range a
 
 At high tumor content, germline and somatic LOH lines begin to converge. Origin determination by VAF alone becomes increasingly difficult.
 
-## Gene Reference System (2025 Kosugi Group Guidelines)
+## Gene Reference System (GPV/PGPV Guidelines 2025 Edition)
 
-The app provides gene-specific contextual messages based on the **2025 Kosugi group guidelines** (がん遺伝子パネル検査におけるGPV/PGPV対応手順に関する指針 2025版), T-only PGPV disclosure recommended gene list (31 genes).
+The app provides gene-specific contextual messages based on the **Guidelines for GPV/PGPV Handling Procedures in Cancer Gene Panel Testing (2025 Edition)** (MHLW Research Grant), T-only PGPV disclosure recommended gene list (31 genes).
 
 | Category | VAF Threshold | Genes | Notes |
 |---|---|---|---|
@@ -85,7 +85,7 @@ The app provides gene-specific contextual messages based on the **2025 Kosugi gr
 - **Interactive graph** with five theoretical VAF-TC curves (Plotly)
 - **Model matching** with +/-10% error margin and theoretical VAF display
 - **Automated interpretation** based on compatible model combinations
-- **Gene-specific messages** for 31 genes per 2025 Kosugi guidelines
+- **Gene-specific messages** for 31 genes per GPV/PGPV Guidelines (2025 Edition)
 - **Five clinical alerts** based on TC values
 - **Low Confidence Zone** shading for TC < 20%
 - **Important Note** on startup with model assumptions and limitations
@@ -140,7 +140,7 @@ streamlit run app.py
 - **Changed** Low VAF / High VAF alerts to **Low TC / High TC** alerts
 - **Changed** Low Confidence Zone from TC < 30% to **TC < 20%**
 - **Added** Important Note on startup (Knudson assumptions, aneuploidy, TC estimation error)
-- **Rebuilt** Gene Reference System per **2025 Kosugi group guidelines** (31 genes, 3 tiers)
+- **Rebuilt** Gene Reference System per **MHLW GPV/PGPV Guidelines (2025 Edition)** (31 genes, 3 tiers)
 
 ## Citation
 

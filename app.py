@@ -11,7 +11,7 @@ st.set_page_config(page_title="VAF-TC Precision Analyzer", layout="wide")
 st.title("🧬 VAF-TC Precision Analyzer")
 st.markdown("Interactive visual tool for germline/somatic variant differentiation in tumor-only sequencing.")
 st.caption("⚠️ This tool is intended as a supportive aid for genetic counseling. It does not replace confirmatory germline testing or established clinical guidelines.")
-st.caption("⚠️ Gene Reference System is based on the **2025 Kosugi group guidelines** (がん遺伝子パネル検査におけるGPV/PGPV対応手順に関する指針 2025版) — T-only PGPV disclosure recommended gene list.")
+st.caption("⚠️ Gene Reference System is based on the **Guidelines for GPV/PGPV Handling Procedures in Cancer Gene Panel Testing (2025 Edition)** (MHLW Research Grant) — T-only PGPV disclosure recommended gene list.")
 
 # Important Note (startup)
 with st.expander("⚠️ Important Note — Mathematical model assumptions and limitations", expanded=True):
@@ -27,49 +27,49 @@ with st.expander("⚠️ Important Note — Mathematical model assumptions and l
 4. **Not a diagnostic tool**: This is a visual aid for genetic counseling. Confirmatory germline testing remains the standard for any clinical decision.
 """)
 
-# 3. Gene Reference Data — based on 2025 Kosugi group guidelines (T-only PGPV disclosure recommended genes, 31 genes)
+# 3. Gene Reference Data — based on Guidelines for GPV/PGPV Handling Procedures in Cancer Gene Panel Testing (2025 Edition)
 GENE_INFO = {
     # 🔴 Low VAF threshold (VAF >= 10%) — special handling
-    "BRCA1":  ("low_threshold", "🔴 BRCA1 [2025 Kosugi]: **VAF ≥ 10%** threshold (lower than standard). Even low-VAF variants may be GPV. Expert panel review and confirmatory germline testing recommended. HBOC."),
-    "BRCA2":  ("low_threshold", "🔴 BRCA2 [2025 Kosugi]: **VAF ≥ 10%** threshold (lower than standard). Even low-VAF variants may be GPV. Expert panel review and confirmatory germline testing recommended. HBOC."),
+    "BRCA1":  ("low_threshold", "🔴 BRCA1 [GPV/PGPV Guidelines 2025]: **VAF ≥ 10%** threshold (lower than standard). Even low-VAF variants may be GPV. Expert panel review and confirmatory germline testing recommended. HBOC."),
+    "BRCA2":  ("low_threshold", "🔴 BRCA2 [GPV/PGPV Guidelines 2025]: **VAF ≥ 10%** threshold (lower than standard). Even low-VAF variants may be GPV. Expert panel review and confirmatory germline testing recommended. HBOC."),
     # 🟠 Age-conditional (disclosure if SNV VAF ≥ 30% / indel ≥ 20% AND age of onset < 30 y)
-    "APC":    ("age_cond", "🟠 APC [2025 Kosugi]: PGPV disclosure if **SNV VAF ≥ 30% (indel ≥ 20%) AND colorectal polyposis onset < 30 y**. FAP. Phenotype evaluation required (Box_E)."),
-    "CDKN2A": ("age_cond", "🟠 CDKN2A [2025 Kosugi]: PGPV disclosure if **SNV VAF ≥ 30% (indel ≥ 20%) AND onset < 30 y**. Hereditary melanoma-pancreatic cancer syndrome."),
-    "PTEN":   ("age_cond", "🟠 PTEN [2025 Kosugi]: PGPV disclosure if **SNV VAF ≥ 30% (indel ≥ 20%) AND onset < 30 y**. Cowden syndrome. Phenotype evaluation required (Box_E)."),
-    "RB1":    ("age_cond", "🟠 RB1 [2025 Kosugi]: PGPV disclosure if **SNV VAF ≥ 30% (indel ≥ 20%) AND onset < 30 y**. Hereditary retinoblastoma. Phenotype evaluation required (Box_E)."),
-    "TP53":   ("age_cond", "🟠 TP53 [2025 Kosugi]: PGPV disclosure if **SNV VAF ≥ 30% (indel ≥ 20%) AND onset < 30 y**. Li-Fraumeni syndrome. Phenotype evaluation required (Box_E). Note: clonal hematopoiesis possible at high VAF."),
+    "APC":    ("age_cond", "🟠 APC [GPV/PGPV Guidelines 2025]: PGPV disclosure if **SNV VAF ≥ 30% (indel ≥ 20%) AND colorectal polyposis onset < 30 y**. FAP. Phenotype evaluation required (Box_E)."),
+    "CDKN2A": ("age_cond", "🟠 CDKN2A [GPV/PGPV Guidelines 2025]: PGPV disclosure if **SNV VAF ≥ 30% (indel ≥ 20%) AND onset < 30 y**. Hereditary melanoma-pancreatic cancer syndrome."),
+    "PTEN":   ("age_cond", "🟠 PTEN [GPV/PGPV Guidelines 2025]: PGPV disclosure if **SNV VAF ≥ 30% (indel ≥ 20%) AND onset < 30 y**. Cowden syndrome. Phenotype evaluation required (Box_E)."),
+    "RB1":    ("age_cond", "🟠 RB1 [GPV/PGPV Guidelines 2025]: PGPV disclosure if **SNV VAF ≥ 30% (indel ≥ 20%) AND onset < 30 y**. Hereditary retinoblastoma. Phenotype evaluation required (Box_E)."),
+    "TP53":   ("age_cond", "🟠 TP53 [GPV/PGPV Guidelines 2025]: PGPV disclosure if **SNV VAF ≥ 30% (indel ≥ 20%) AND onset < 30 y**. Li-Fraumeni syndrome. Phenotype evaluation required (Box_E). Note: clonal hematopoiesis possible at high VAF."),
     # 🟡 Standard (SNV VAF ≥ 30% / indel ≥ 20%) — 24 genes
-    "ATM":    ("standard", "🟡 ATM [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. HBOC, ataxia-telangiectasia."),
-    "BAP1":   ("standard", "🟡 BAP1 [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. BAP1 tumor predisposition syndrome."),
-    "BARD1":  ("standard", "🟡 BARD1 [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. HBOC."),
-    "BRIP1":  ("standard", "🟡 BRIP1 [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. HBOC."),
-    "CHEK2":  ("standard", "🟡 CHEK2 [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. HBOC."),
-    "DICER1": ("standard", "🟡 DICER1 [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. DICER1 syndrome (pleuropulmonary blastoma, etc.)."),
-    "FH":     ("standard", "🟡 FH [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. HLRCC (hereditary leiomyomatosis and renal cell cancer)."),
-    "FLCN":   ("standard", "🟡 FLCN [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Birt-Hogg-Dubé syndrome."),
-    "MLH1":   ("standard", "🟡 MLH1 [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Lynch syndrome."),
-    "MSH2":   ("standard", "🟡 MSH2 [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Lynch syndrome."),
-    "MSH6":   ("standard", "🟡 MSH6 [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Lynch syndrome."),
-    "MUTYH":  ("standard", "🟡 MUTYH [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**, **bi-allelic only**. MUTYH-associated polyposis."),
-    "NF1":    ("standard", "🟡 NF1 [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Neurofibromatosis type 1. Phenotype evaluation required (Box_E)."),
-    "PALB2":  ("standard", "🟡 PALB2 [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. HBOC."),
-    "PMS2":   ("standard", "🟡 PMS2 [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Lynch syndrome."),
-    "POLD1":  ("standard", "🟡 POLD1 [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Hereditary colorectal cancer."),
-    "POLE":   ("standard", "🟡 POLE [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Hereditary colorectal cancer."),
-    "RAD51C": ("standard", "🟡 RAD51C [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. HBOC."),
-    "RAD51D": ("standard", "🟡 RAD51D [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. HBOC."),
-    "RET":    ("standard", "🟡 RET [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. MEN2 (multiple endocrine neoplasia type 2)."),
-    "SDHA":   ("standard", "🟡 SDHA [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Hereditary paraganglioma-pheochromocytoma syndrome."),
-    "SDHB":   ("standard", "🟡 SDHB [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Hereditary paraganglioma-pheochromocytoma syndrome."),
-    "TSC2":   ("standard", "🟡 TSC2 [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Tuberous sclerosis complex."),
-    "VHL":    ("standard", "🟡 VHL [2025 Kosugi]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. von Hippel-Lindau syndrome."),
+    "ATM":    ("standard", "🟡 ATM [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. HBOC, ataxia-telangiectasia."),
+    "BAP1":   ("standard", "🟡 BAP1 [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. BAP1 tumor predisposition syndrome."),
+    "BARD1":  ("standard", "🟡 BARD1 [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. HBOC."),
+    "BRIP1":  ("standard", "🟡 BRIP1 [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. HBOC."),
+    "CHEK2":  ("standard", "🟡 CHEK2 [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. HBOC."),
+    "DICER1": ("standard", "🟡 DICER1 [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. DICER1 syndrome (pleuropulmonary blastoma, etc.)."),
+    "FH":     ("standard", "🟡 FH [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. HLRCC (hereditary leiomyomatosis and renal cell cancer)."),
+    "FLCN":   ("standard", "🟡 FLCN [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Birt-Hogg-Dubé syndrome."),
+    "MLH1":   ("standard", "🟡 MLH1 [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Lynch syndrome."),
+    "MSH2":   ("standard", "🟡 MSH2 [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Lynch syndrome."),
+    "MSH6":   ("standard", "🟡 MSH6 [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Lynch syndrome."),
+    "MUTYH":  ("standard", "🟡 MUTYH [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**, **bi-allelic only**. MUTYH-associated polyposis."),
+    "NF1":    ("standard", "🟡 NF1 [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Neurofibromatosis type 1. Phenotype evaluation required (Box_E)."),
+    "PALB2":  ("standard", "🟡 PALB2 [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. HBOC."),
+    "PMS2":   ("standard", "🟡 PMS2 [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Lynch syndrome."),
+    "POLD1":  ("standard", "🟡 POLD1 [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Hereditary colorectal cancer."),
+    "POLE":   ("standard", "🟡 POLE [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Hereditary colorectal cancer."),
+    "RAD51C": ("standard", "🟡 RAD51C [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. HBOC."),
+    "RAD51D": ("standard", "🟡 RAD51D [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. HBOC."),
+    "RET":    ("standard", "🟡 RET [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. MEN2 (multiple endocrine neoplasia type 2)."),
+    "SDHA":   ("standard", "🟡 SDHA [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Hereditary paraganglioma-pheochromocytoma syndrome."),
+    "SDHB":   ("standard", "🟡 SDHB [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Hereditary paraganglioma-pheochromocytoma syndrome."),
+    "TSC2":   ("standard", "🟡 TSC2 [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. Tuberous sclerosis complex."),
+    "VHL":    ("standard", "🟡 VHL [GPV/PGPV Guidelines 2025]: Disclosure at **SNV VAF ≥ 30% (indel ≥ 20%)**. von Hippel-Lindau syndrome."),
 }
 
 def get_gene_message(gene):
     key = gene.upper().strip()
     if key in GENE_INFO:
         return GENE_INFO[key]
-    return ("not_listed", f"⬜ {gene}: Not on the 2025 Kosugi group T-only PGPV disclosure recommended gene list. Germline disclosure priority is lower per the guidelines. Consult clinical guidelines and family history for comprehensive assessment.")
+    return ("not_listed", f"⬜ {gene}: Not on the 2025 T-only PGPV disclosure recommended gene list (MHLW GPV/PGPV Guidelines). Germline disclosure priority is lower per the guidelines. Consult clinical guidelines and family history for comprehensive assessment.")
 
 # 4. Sidebar Input Parameters
 st.sidebar.header("📋 Patient Data Input")
@@ -104,8 +104,8 @@ if uploaded_file is not None:
 st.sidebar.markdown("---")
 st.sidebar.info(f"💡 **Analysis Mode:** {gene_name}")
 
-# Gene Reference Table in Sidebar (2025 Kosugi guidelines)
-with st.sidebar.expander("📖 Gene Reference (2025 Kosugi guidelines)"):
+# Gene Reference Table in Sidebar (GPV/PGPV Guidelines 2025)
+with st.sidebar.expander("📖 Gene Reference (GPV/PGPV Guidelines 2025)"):
     st.markdown("**🔴 Low VAF threshold (VAF ≥ 10%):**")
     st.caption("BRCA1, BRCA2")
     st.markdown("**🟠 Age-conditional (onset < 30 y):**")
@@ -113,7 +113,7 @@ with st.sidebar.expander("📖 Gene Reference (2025 Kosugi guidelines)"):
     st.markdown("**🟡 Standard (SNV VAF ≥ 30%, indel ≥ 20%):**")
     st.caption("ATM, BAP1, BARD1, BRIP1, CHEK2, DICER1, FH, FLCN, MLH1, MSH2, MSH6, MUTYH(bi), NF1, PALB2, PMS2, POLD1, POLE, RAD51C, RAD51D, RET, SDHA, SDHB, TSC2, VHL")
     st.caption("⬜ Genes not listed: not on the 2025 T-only PGPV list.")
-    st.caption("Reference: がん遺伝子パネル検査におけるGPV/PGPV対応手順に関する指針2025版 (小杉班指針)")
+    st.caption("Reference: MHLW Research Grant — Guidelines for GPV/PGPV Handling Procedures in Cancer Gene Panel Testing (2025 Edition)")
 
 tc = tc_input / 100.0
 vaf = vaf_input / 100.0
@@ -203,10 +203,10 @@ with col_alerts:
             st.warning("⚠️ **Low TC (≤ 20%):** At low tumor content, theoretical lines are compressed into a narrow VAF range and model matching is less reliable. Subclonal variants, admixture with normal tissue, or technical noise may dominate.")
         if t >= 60:
             st.warning("⚠️ **High TC (≥ 60%):** At high tumor content, germline and somatic LOH lines begin to converge. Origin determination by VAF alone becomes increasingly difficult.")
-        # Gene-specific message (2025 Kosugi guidelines)
+        # Gene-specific message (GPV/PGPV Guidelines 2025)
         _, gene_msg = get_gene_message(g)
         st.info(gene_msg)
-        st.caption("💡 Note: VAF–TC interpretation is based on mathematical models only. Gene-specific germline likelihood is provided separately per the 2025 Kosugi guidelines.")
+        st.caption("💡 Note: VAF–TC interpretation is based on mathematical models only. Gene-specific germline likelihood is provided separately per the GPV/PGPV Guidelines (2025 Edition).")
 
     if multi_df is not None:
         for _, row in multi_df.iterrows():
